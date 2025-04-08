@@ -34,7 +34,7 @@ In e-commerce, AI boosts conversion rates, customer loyalty, and operational eff
 🛠️ Installation
 
 # Clone the repository
-git clone https://github.com/yourusername/sneakerstore-ai.git
+git clone https://github.com/theocolla/sneakerstore-ai.git
 
 # Navigate to the project folder
 cd sneakerstore-ai
