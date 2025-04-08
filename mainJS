@@ -1,0 +1,244 @@
+// functions of chatbot
+function getBotResponse(userMessage) {
+    const responses = {
+        "hello": "Hi there! How can I assist you today?",
+        "hi": "Hello! What can I do for you?",
+        "products": "We have a wide range of sneakers. Check out our 'Products' section!",
+        "price": "Our prices range from CA$ 159.90 to CA$ 229.90. Which product are you interested in?",
+        "help": "I can help you with product information, prices, and more. Just ask!",
+        "default": "I'm sorry, I didn't understand that. Can you please rephrase?"
+    };
+
+    userMessage = userMessage.toLowerCase();
+    return responses[userMessage] || responses["default"];
+}
+
+// Variáveis globais
+let selectedProduct = null;
+let selectedSize = null;
+let selectedPayment = null;
+
+// Inicialização quando o documento estiver pronto
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar elementos do chat
+    initializeChat();
+    
+    // Inicializar modal de compra
+    initializePurchaseModal();
+    
+    // Carregar métodos de pagamento
+    loadPaymentMethods();
+    
+    // Adicionar eventos aos botões de compra
+    initializeAddToCartButtons();
+});
+
+function initializeChat() {
+    const chatButton = document.getElementById('chatButton');
+    const chatClose = document.getElementById('chatClose');
+    const chatPopup = document.getElementById('chatPopup');
+    const sendButton = document.getElementById('sendButton');
+    const userInput = document.getElementById('userInput');
+
+    chatButton.addEventListener('click', function() {
+        chatPopup.style.display = 'block';
+        if (document.getElementById('chatbox').innerHTML === '') {
+            document.getElementById('chatbox').innerHTML = "<p class='bot-message'><b>Bebo:</b> Hello! How can I help you today?</p>";
+        }
+    });
+
+    chatClose.addEventListener('click', function() {
+        chatPopup.style.display = 'none';
+    });
+
+    sendButton.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    });
+}
+
+function initializePurchaseModal() {
+    const modal = document.getElementById('purchaseModal');
+    const closeModal = document.querySelector('.modal-close');
+    const cancelPurchase = document.getElementById('cancelPurchase');
+    const confirmPurchase = document.getElementById('confirmPurchase');
+
+    closeModal.onclick = () => modal.style.display = 'none';
+    cancelPurchase.onclick = () => modal.style.display = 'none';
+    window.onclick = (event) => {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    };
+
+    confirmPurchase.onclick = handlePurchaseConfirmation;
+}
+
+function loadPaymentMethods() {
+    fetch('/api/payment-methods')
+        .then(response => response.json())
+        .then(methods => {
+            const paymentOptions = document.getElementById('paymentOptions');
+            methods.forEach(method => {
+                const option = document.createElement('div');
+                option.className = 'payment-option';
+                option.setAttribute('data-id', method.id);
+                option.innerHTML = `${method.icon} ${method.name}`;
+                option.onclick = () => selectPayment(method.id);
+                paymentOptions.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Erro ao carregar métodos de pagamento:', error));
+}
+
+function initializeAddToCartButtons() {
+    console.log('Inicializando botões de compra');
+    const buttons = document.querySelectorAll('.add-to-cart');
+    console.log('Número de botões encontrados:', buttons.length);
+    
+    buttons.forEach(button => {
+        const productId = button.getAttribute('data-product-id');
+        console.log('Configurando botão com ID:', productId);
+        
+        button.addEventListener('click', function() {
+            console.log('Botão Add to Cart clicado para produto ID:', productId);
+            
+            if (!productId) {
+                console.error('Product ID não encontrado no botão');
+                alert('Erro ao identificar o produto. Por favor, tente novamente.');
+                return;
+            }
+            
+            fetch(`/api/products/${productId}`)
+                .then(response => {
+                    console.log('Resposta da API:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`Erro ao buscar produto: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(product => {
+                    console.log('Produto recebido:', product);
+                    if (!product) {
+                        throw new Error('Produto não encontrado');
+                    }
+                    
+                    selectedProduct = product;
+                    
+                    // Limpar seleções anteriores
+                    selectedSize = null;
+                    selectedPayment = null;
+                    
+                    // Limpar e preencher opções de tamanho
+                    const sizeOptions = document.getElementById('sizeOptions');
+                    sizeOptions.innerHTML = '';
+                    product.sizes.forEach(size => {
+                        const option = document.createElement('div');
+                        option.className = 'size-option';
+                        option.textContent = size;
+                        option.onclick = () => selectSize(size);
+                        sizeOptions.appendChild(option);
+                    });
+                    
+                    // Limpar seleção de pagamento
+                    document.querySelectorAll('.payment-option').forEach(opt => 
+                        opt.classList.remove('selected')
+                    );
+                    
+                    console.log('Abrindo modal para produto:', product.name);
+                    document.getElementById('purchaseModal').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Erro ao processar produto:', error);
+                    alert('Erro ao carregar o produto. Por favor, tente novamente.');
+                });
+        });
+    });
+}
+
+function selectSize(size) {
+    selectedSize = size;
+    document.querySelectorAll('.size-option').forEach(opt => {
+        opt.classList.remove('selected');
+        if (parseInt(opt.textContent) === size) {
+            opt.classList.add('selected');
+        }
+    });
+}
+
+function selectPayment(paymentId) {
+    selectedPayment = paymentId;
+    document.querySelectorAll('.payment-option').forEach(opt => {
+        opt.classList.remove('selected');
+        if (parseInt(opt.getAttribute('data-id')) === paymentId) {
+            opt.classList.add('selected');
+        }
+    });
+}
+
+function handlePurchaseConfirmation() {
+    if (!selectedSize || !selectedPayment) {
+        alert('Please select both size and payment method');
+        return;
+    }
+
+    fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            productId: selectedProduct.id,
+            size: selectedSize,
+            paymentMethod: selectedPayment
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Purchase completed successfully!');
+            document.getElementById('purchaseModal').style.display = 'none';
+        } else {
+            alert('Error processing purchase: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Purchase error:', error);
+        alert('Error processing purchase. Please try again.');
+    });
+}
+
+function sendMessage() {
+    const userInput = document.getElementById("userInput");
+    const chatbox = document.getElementById("chatbox");
+    const message = userInput.value.trim();
+    
+    if (message === '') return;
+    
+    chatbox.innerHTML += `<p class='user-message'><b>Você:</b> ${message}</p>`;
+    userInput.value = "";
+    
+    fetch('/ask', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ question: message })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            chatbox.innerHTML += "<p class='bot-message'><b>Bebo:</b> Desculpe, ocorreu um erro. Tente novamente.</p>";
+        } else {
+            chatbox.innerHTML += `<p class='bot-message'><b>Bebo:</b> ${data.answer}</p>`;
+        }
+        chatbox.scrollTop = chatbox.scrollHeight;
+    })
+    .catch(error => {
+        console.error('Erro no chat:', error);
+        chatbox.innerHTML += "<p class='bot-message'><b>Bebo:</b> Desculpe, ocorreu um erro de conexão. Tente novamente.</p>";
+        chatbox.scrollTop = chatbox.scrollHeight;
+    });
+} 
