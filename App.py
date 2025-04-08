@@ -29,15 +29,15 @@ class CustomLogicAdapter(LogicAdapter):
             "I'd be happy to assist with {}. What exactly would you like to know?"
         ]
 
-        # Pega a melhor resposta do BestMatch
+    
         response = self.chatbot.storage.get_random()
         
-        # Se a confiança for muito baixa, usa uma resposta de fallback
+        
         if response.confidence < 0.5:
-            # Extrai palavras-chave da pergunta
+            
             keywords = [word for word in input_statement.text.lower().split() if len(word) > 3]
             if keywords:
-                topic = keywords[0]  # Usa a primeira palavra-chave como tópico
+                topic = keywords[0]  
                 response.text = random.choice(fallback_responses).format(topic)
                 response.confidence = 0.5
             else:
@@ -46,7 +46,7 @@ class CustomLogicAdapter(LogicAdapter):
 
         return response
 
-# Inicializa o chatbot com configurações específicas
+
 chatbot = ChatBot(
     "BeBot",
     logic_adapters=[
@@ -69,11 +69,11 @@ chatbot = ChatBot(
     database_uri='sqlite:///database.sqlite3'
 )
 
-# Configura os treinadores
+
 list_trainer = ListTrainer(chatbot, show_training_progress=False)
 corpus_trainer = ChatterBotCorpusTrainer(chatbot, show_training_progress=False)
 
-# Lista de saudações e despedidas personalizadas
+
 greetings = [
     ["hi", "Hello! I'm Bebo, your virtual shopping assistant. How can I help you today?"],
     ["hello", "Hi there! I'm Bebo, ready to help you find the perfect sneakers. What can I do for you?"],
@@ -83,11 +83,11 @@ greetings = [
     ["good evening", "Good evening! I'm Bebo, ready to help you with anything you need. What are you looking for?"]
 ]
 
-# Treina o chatbot
+
 for greeting in greetings:
     list_trainer.train(greeting)
 
-# Treina com os corpus em inglês
+
 corpus_trainer.train(
     "chatterbot.corpus.english.greetings",
     "chatterbot.corpus.english.conversations",
@@ -97,14 +97,14 @@ corpus_trainer.train(
 
 def get_chatbot_response(question):
     try:
-        # Processa a pergunta e obtém a resposta
+    
         response = chatbot.get_response(question)
         
-        # Se a confiança for muito baixa, tenta encontrar palavras-chave
+        
         if response.confidence < 0.5:
             keywords = [word for word in question.lower().split() if len(word) > 3]
             if keywords:
-                # Tenta novamente com as palavras-chave
+                
                 keyword_response = chatbot.get_response(" ".join(keywords))
                 if keyword_response.confidence > response.confidence:
                     response = keyword_response
@@ -115,12 +115,12 @@ def get_chatbot_response(question):
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        # Se chamado como script, retorna a resposta diretamente
+      
         question = sys.argv[1]
         response = get_chatbot_response(question)
         print(response)
     else:
-        # Se executado diretamente, inicia o servidor Flask
+      
         app = Flask(__name__)
 
         @app.route("/")
