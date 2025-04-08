@@ -3,7 +3,7 @@ from chatterbot.trainers import ListTrainer
 import collections.abc
 collections.Hashable = collections.abc.Hashable
 
-# Configuração do chatbot
+
 chatbot = ChatBot(
     "BeBot",
     logic_adapters=[
@@ -22,7 +22,6 @@ chatbot = ChatBot(
     database_uri='sqlite:///database.sqlite3'
 )
 
-# Treinamento básico com saudações
 trainer = ListTrainer(chatbot, show_training_progress=False)
 greetings = [
     ["hi", "Hello! I'm Bebo, your virtual shopping assistant. How can I help you today?"],
