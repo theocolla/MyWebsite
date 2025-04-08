@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SneakerStore - Your Sneaker Shop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+        }
+
+        header {
+            background-color: #222;
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: #ff6b6b;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: #ff6b6b;
+        }
+
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/api/placeholder/1200/400') center/cover no-repeat;
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #ff6b6b;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #ff5252;
+        }
+
+        .products {
+            padding: 60px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 32px;
+            color: #333;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .product-image {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-name {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .product-price {
+            font-size: 22px;
+            color: #ff6b6b;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .add-to-cart {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .add-to-cart:hover {
+            background-color: #555;
+        }
+
+        footer {
+            background-color: #222;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+            margin-bottom: 20px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 20px;
+            color: #ff6b6b;
+        }
+
+        .footer-bottom {
+            margin-top: 40px;
+            border-top: 1px solid #444;
+            padding-top: 20px;
+        }
+
+        /* Chatbot styles */
+        .chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .chat-button {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            font-size: 24px;
+        }
+
+        .chat-button:hover {
+            background-color: #ff5252;
+        }
+
+        .chat-popup {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 320px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            overflow: hidden;
+            display: none;
+        }
+
+        .chat-header {
+            background-color: #ff6b6b;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        #chatbox {
+            height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            background-color: #f9f9f9;
+        }
+
+        .chat-input-container {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        #userInput {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        .chat-send {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .chat-send:hover {
+            background-color: #ff5252;
+        }
+
+        #chatbox p {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 18px;
+            max-width: 80%;
+        }
+
+        #chatbox p b {
+            display: block;
+            margin-bottom: 3px;
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+
+        #chatbox p.user-message {
+            background-color: #e9ecef;
+            text-align: left;
+            align-self: flex-start;
+            margin-right: auto;
+            margin-left: 0;
+        }
+
+        #chatbox p.bot-message {
+            background-color: #ff6b6b;
+            color: white;
+            text-align: right;
+            align-self: flex-end;
+            margin-left: auto;
+            margin-right: 0;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .size-selection, .payment-selection {
+            margin-bottom: 20px;
+        }
+
+        .size-options, .payment-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .size-option, .payment-option {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .size-option:hover, .payment-option:hover {
+            background-color: #f0f0f0;
+        }
+
+        .size-option.selected, .payment-option.selected {
+            background-color: #ff6b6b;
+            color: white;
+            border-color: #ff6b6b;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .modal-btn.primary {
+            background-color: #ff6b6b;
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background-color: #ddd;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">Sneaker<span>Store</span></div>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Products</a></li>
+                    <li><a href="#">Deals</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>The best sneakers for you</h1>
+            <p>Discover the latest trends in sports and casual footwear</p>
+            <a href="#" class="btn">Shop Now</a>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products container">
+        <h2 class="section-title">Featured Products</h2>
+        <div class="product-grid">
+            <!-- Product 1 -->
+            <div class="product-card">
+                <img src="https://rmilet.vteximg.com.br/arquivos/ids/8557620-593-593/Tenis-de-Corrida-Preto-Index-III-%7C-Olympikus-Tamanho--37---Cor--PRETO-0.jpg?v=638637392171030000" alt="Sports Sneaker" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-name">Runner Pro Sneakers</h3>
+                    <p class="product-price">CA$ 199.90</p>
+                    <button class="add-to-cart" data-product-id="1">Add to Cart</button>
+                </div>
+            </div>
+            
+            <!-- Product 2 -->
+            <div class="product-card">
+                <img src="https://images.tcdn.com.br/img/img_prod/1112850/tenis_masculino_urbano_em_couro_branco_pegada_2371_1_5b5e5f1a0a62c7547698f65c0082b655.jpg" alt="Casual Sneaker" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-name">Urban Style Sneakers</h3>
+                    <p class="product-price">CA$ 159.90</p>
+                    <button class="add-to-cart" data-product-id="2">Add to Cart</button>
+                </div>
+            </div>
+            
+            <!-- Product 3 -->
+            <div class="product-card">
+                <img src="https://aramisnova.vtexassets.com/arquivos/ids/1234688-510-765" alt="Performance Sneaker" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-name">Performance X Sneakers</h3>
+                    <p class="product-price">CA$ 229.90</p>
+                    <button class="add-to-cart" data-product-id="3">Add to Cart</button>
+                </div>
+            </div>
+            
+            <!-- Product 4 -->
+            <div class="product-card">
+                <img src="https://images.tcdn.com.br/img/img_prod/775752/tenis_ous_skate_emergente_preto_verde_latex_essencial_3481_1_73ffdd958454f32eea1ace5cb5d59355.jpg" alt="Skate Sneaker" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-name">Premium Skate Sneakers</h3>
+                    <p class="product-price">CA$ 179.90</p>
+                    <button class="add-to-cart" data-product-id="4">Add to Cart</button>
+                </div>
+            </div>
+            
+            <!-- Product 5 -->
+            <div class="product-card">
+                <img src="https://a-static.mlcdn.com.br/1500x1500/tenis-de-trilha-sapato-adventure-confortavel-solado-tratorado-senhorelle/trailshoes/40355a4ae2fa11eda9124201ac185033/24ae42325d469fd99d60250b8ef9fb7d.jpeg" alt="Hiking Sneaker" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-name">Trail Walker Sneakers</h3>
+                    <p class="product-price">CA$ 219.90</p>
+                    <button class="add-to-cart" data-product-id="5">Add to Cart</button>
+                </div>
+            </div>
+            
+            <!-- Product 6 -->
+            <div class="product-card">
+                <img src="https://cdn.shopify.com/s/files/1/0570/8867/1938/files/Designsemnome_8_480x480.png?v=1673532789" alt="Fashion Sneaker" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-name">Fashion Wave Sneakers</h3>
+                    <p class="product-price">CA$ 169.90</p>
+                    <button class="add-to-cart" data-product-id="6">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-section">
+                <h3>About Us</h3>
+                <p>We are a store specializing in high-quality sneakers for all styles and occasions.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Useful Links</h3>
+                <ul>
+                    <li><a href="#">Terms & Conditions</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p>Email: theocola05@gmail.com</p>
+                <p>Phone: (437) 660-6093</p>
+            </div>
+        </div>
+        <div class="footer-bottom container">
+            <p>&copy; 2025 SneakerStore. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Chatbot -->
+    <div class="chatbot-container">
+        <button class="chat-button" id="chatButton">🤖</button>
+        <div class="chat-popup" id="chatPopup">
+            <div class="chat-header">
+                <h3>Bebo - Virtual Assistant</h3>
+                <button class="chat-close" id="chatClose">✕</button>
+            </div>
+            <div id="chatbox"></div>
+            <div class="chat-input-container">
+                <input type="text" id="userInput" placeholder="Type your message..." />
+                <button class="chat-send" id="sendButton">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Compra -->
+    <div id="purchaseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Complete Your Purchase</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="size-selection">
+                <h3>Choose Your Size</h3>
+                <div class="size-options" id="sizeOptions"></div>
+            </div>
+            <div class="payment-selection">
+                <h3>Select Payment Method</h3>
+                <div class="payment-options" id="paymentOptions"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" id="cancelPurchase">Cancel</button>
+                <button class="modal-btn primary" id="confirmPurchase">Confirm Purchase</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM reloaded, checking elements:');
+            console.log('Botões de compra:', document.querySelectorAll('.add-to-cart').length);
+            console.log('Modal:', document.getElementById('purchaseModal'));
+            console.log('Size options:', document.getElementById('sizeOptions'));
+            console.log('Payment options:', document.getElementById('paymentOptions'));
+        });
+    </script>
+</body>
+</html>
